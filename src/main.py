@@ -17,7 +17,7 @@ def config_for_multifile_python():
         sys.path.remove(script_dir)
             
     sys.path.append(script_dir)
-    print(f"{sys.path}")
+    # print(f"{sys.path}")
 
 # -------------------- bootstrap --------------------
 config_for_multifile_python()
@@ -27,10 +27,15 @@ import anim
 importlib.reload(helpers)
 importlib.reload(anim)
 
-import singleton_test
-singleton_test.signleton_demo()
+# from client.client_hub import client_hub
+# client_hub().stop_connection()
+# importlib.reload(client_hub)
 
-importlib.reload(singleton_test)
+import client.client_hub as chb
+chb.client_hub().stop_connection()
+chb.client_hub().stop_thread()
+importlib.reload(chb)
+client_hub = chb.client_hub
 
 # -------------------- main --------------------
 
@@ -66,7 +71,8 @@ def main():
 
     cube_names = spawn_content()
     anim.setup_animation(cube_names)
-    singleton_test.signleton_demo()
+    client_hub().start_connection()
+
     print("--- script done ---")
 
 

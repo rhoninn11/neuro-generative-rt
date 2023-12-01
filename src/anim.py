@@ -1,7 +1,6 @@
 import math
 import bpy
 import time
-import singleton_test
 
 def cube_osc(name: str, freq: float, tp: float):
     sine_value = math.sin(2 * math.pi * freq * tp)
