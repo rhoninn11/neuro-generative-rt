@@ -1,12 +1,17 @@
 
 import select
 
-from utils import obj2json2bytes, bytes2json2obj
+from utils.thread_wrap import thread_wrap
+from utils.utils import obj2json2bytes, bytes2json2obj
 
-class client_base():
+class tcp_msg_thread(thread_wrap):
     def __init__(self, name="noname"):
-        self.name = name
+        thread_wrap.__init__(self, name)
         self.disconnect_flag = False
+    
+    def print(self, msg):
+        msg_with_name = f"{self.name} {msg}"
+        print(msg_with_name)
 
     def wrap_data(self, data_bytes):
         if data_bytes[-1] != b'\0':

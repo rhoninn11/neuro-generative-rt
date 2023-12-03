@@ -1,96 +1,45 @@
 
-
-import socket
-import importlib
-import threading
-import time
-
+import bpy
+from client.client_thread import client_thread
 from utils.singleton_meta import singleton_meta
-
-class simple_thread(threading.Thread):
-    def script(self):
-        print(f"+++elo")
-        time.sleep(1)
-        print(f"+++elo")
-        time.sleep(1)
-        print(f"+++elo")
-        time.sleep(1)
-        print(f"+++elo")
-        time.sleep(1)
-        print(f"+++elo")
-        time.sleep(1)
-        print(f"+++elo")
-        time.sleep(1)
-        print(f"+++elo")
-        time.sleep(1)
-
-    def run(self):
-        self.script()
-
-class thread_hub(metaclass=singleton_meta):
-    def __init__(self):
-        self.thread = None
-        self.thread_active = False
-
-
 
 class client_hub(metaclass=singleton_meta):
     def __init__(self):
-        self.tcp_socket = None
         self.host = 'localhost'
         self.port = 4444
-        self.connected = False
-        self.thread = None
+        self.thread = client_thread("client_thread")
+        self.is_running = False
+        self.last_data = []
 
-    def start_connection(self):
-        if self.connected:
-            self.stop_connection()
-        
-        server_address = (self.host, self.port)
-        self.start_thread()
-        try:
-            tcp_s = socket.create_connection(server_address)
-            tcp_s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            tcp_s.bind(server_address)
-            tcp_s.listen(1)
-            
-            self.tcp_socket = tcp_s
-            self.connected = True
-            print(f"+++ connected to {server_address}")
-        except Exception as e:
-            self.connected = False
-            print(f"+++ error while connecting")
-            
-
-    def stop_connection(self):
-        if not self.connected:
-            return
-        
-        tcp_s = self.tcp_socket
-        tcp_s.close()
-        
-        self.connected = False
-        print(f"+++ disconnected")
-
-    def start_thread(self):
-        if self.thread is not None:
+    def start(self):
+        if self.is_running:
             return
         
         print(f"+++ starting thread")
-        self.thread = simple_thread()
+        self.thread.config_host_dst(self.host, self.port)
         self.thread.start()
+        self.is_running = True
 
-    def stop_thread(self):
-        if self.thread is None:
+    def stop(self):
+        if not self.is_running:
             return
         
         print(f"+++ stopping thread")
-        self.thread.join()
-        self.thread = None
+        self.thread.stop()
+        self.is_running = False
 
-    def setup_animation(names):
+    def elo(self):
+        
+        anim_frames = self.thread.out_queue.queue_len()
+        data = self.thread.out_queue.dequeue_item()
+        self.last_data = data
+        print(f"+++ anim_frames: {anim_frames}")
+        print(f"+++ data: {data}")
+
+    def setup_animation(self, names):
         freq = 1
+        anim_handler = lambda scene: self.elo()
         # anim_handler = lambda scene: cubes_osc(names, freq)
-        # bpy.app.handlers.frame_change_pre.append(anim_handler)
+        bpy.app.handlers.frame_change_pre.append(anim_handler)
 
         print(f"--- animation setup done ---")

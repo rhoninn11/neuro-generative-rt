@@ -3,16 +3,17 @@ import time
 import socket
 
 from utils.pipe_queue import pipe_queue
-from client_base import client_base
-class client(client_base):
+from client.tcp_msg_thread import tcp_msg_thread
+
+class conn_thread(tcp_msg_thread):
     def __init__(self, name="noname"):
-        client_base.__init__(self, name)
+        tcp_msg_thread.__init__(self, name)
         self.connect_ack = False
         self.disconnect_ack = False
 
     def progress_balance(self, progress):
         if progress == 0:
-            time.sleep(0.01)
+            time.sleep(0.1)
 
     def process_information(self, information_obj, out_pipe: pipe_queue):
         is_disconnect = "disconnect" in information_obj    
@@ -27,6 +28,8 @@ class client(client_base):
 
         operate_normal = not is_connect and not is_disconnect   
         if operate_normal:
+            # self.print(f"+++ other obj recived")
+            # self.print(f"+++ {information_obj}")
             
             out_pipe.queue_item(information_obj)
             
@@ -35,33 +38,32 @@ class client(client_base):
         simple_obj = { key:1 }
         try:
             self.send(connection, simple_obj, id=1)
-            # self.print(f"+++ {key} obj sended")
+            self.print(f"+++ {key} obj sended")
         except:
-            # self.print(f"!!! {key} obj send failed")
-            pass
-    
-    def _pre_loop(self, connection: socket):
+            self.print(f"!!! {key} obj send failed")
+
+
+    def connection_loop(self, connection, conn_in_q: pipe_queue, conn_out_q: pipe_queue):
+        
         self.connect_ack = False
         self.disconnect_ack = False
         self.disconnect_flag = False
         self.send_simple_obj(connection, "connect")
+        while self.run_cond and not self.disconnect_ack and not self.disconnect_flag:
+            
+            progress = 0
+            if conn_in_q.queue_len():
+                obj_2_send = conn_in_q.dequeue_item()
+                self.send(connection, obj_2_send)
+                progress += 1
+            
+            recived_obj = self.recive_nb(connection)
+            if recived_obj:
+                self.process_information(recived_obj, conn_out_q)
+                progress += 1
 
-    def _post_loop(self, connection: socket):
+            self.progress_balance(progress)
+        
         if self.connect_ack and not self.disconnect_ack:
             self.send_simple_obj(connection, "disconnect")
             self.disconnect_ack = True
-
-    def _loop_body(self, connection: socket, out_queue: pipe_queue):
-        not_disconnected_yet = not self.disconnect_ack and not self.disconnect_flag
-        while not_disconnected_yet:
-            recived_obj = self.recive_nb(connection)
-            if recived_obj:
-                self.process_information(recived_obj, out_queue)
-
-    def connection_loop(self, connection: socket, out_queue: pipe_queue):
-        self._pre_loop(connection)
-        self._loop_body(connection, out_queue)
-        self._post_loop(connection)
-        
-
-
