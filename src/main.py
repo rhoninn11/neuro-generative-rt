@@ -67,8 +67,8 @@ def main():
     helpers.scene_setup()
 
     cube_names = spawn_content()
-    anim.setup_animation(cube_names)
-    # client_hub().setup_animation(cube_names)
+    # anim.setup_animation(cube_names)
+    client_hub().setup_animation(cube_names)
     client_hub().start()
 
     print("--- script done ---")

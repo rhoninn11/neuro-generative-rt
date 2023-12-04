@@ -2,22 +2,32 @@ import math
 import bpy
 import time
 
-def cube_osc(name: str, freq: float, tp: float):
-    sine_value = math.sin(2 * math.pi * freq * tp)
+def set_cube_z_pos(name: str, value: float):
     obj = bpy.data.objects.get(name)
     if obj:
-        obj.location.z = sine_value
+        obj.location.z = value
 
-def cubes_osc(names: list[str], freq: float):
-    # print(f"--- frame {bpy.context.scene.frame_current} ---")
-    tp = time.time()
-    td = 1 / len(names)
-    for i, name in enumerate(names):
-        cube_osc(name, freq, tp + td * i)
+def set_cube_scale(name: str, value: float):
+    obj = bpy.data.objects.get(name)
+    if obj:
+        obj.scale[0] = value
+        obj.scale[1] = value
+        obj.scale[2] = value
 
-def setup_animation(names):
-    freq = 1
-    anim_handler = lambda scene: cubes_osc(names, freq)
-    bpy.app.handlers.frame_change_pre.append(anim_handler)
 
-    print(f"--- animation setup done ---")
+def cubes_osc(names: list[str], data: list[list[float]]):
+
+    pos_data = data[0]
+    scale_data = data[1]
+    color_data = data[2]
+
+    common_len = min(len(names), len(pos_data),
+                     len(scale_data), len(color_data))
+    _names = names[:common_len]
+    _pos_data = pos_data[:common_len]
+    _scale_data = scale_data[:common_len]
+    _color_data = color_data[:common_len]
+
+    for name, pos, scale, color in zip(_names, _pos_data, _scale_data, _color_data):
+        set_cube_z_pos(name, pos)
+        set_cube_scale(name, scale)
