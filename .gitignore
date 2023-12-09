@@ -1,4 +1,6 @@
 *.blend
 *.blend1
 
+!blends/*.blend
+
 __pycache__
