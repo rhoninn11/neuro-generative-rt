@@ -13,6 +13,8 @@ def apply_geo_node_control(obj, values):
         return
     
     names = ["Socket_2", "Socket_3", "Socket_4"]
+    print("names", names)
+    print("values", values[:3])
 
     for name, value in zip(names, values):
         gn_mod[name] = value

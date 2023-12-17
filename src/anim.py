@@ -49,11 +49,15 @@ def cubes_osc(names: list[str], data: list[list[float]]):
         param_3_offset = 0.00
         param_3_scale = 0.1 - param_3_offset
 
+        param_4_offset = 0.00
+        param_4_scale = 1.00 - param_3_offset
+
         values = [
             param_1_offset + param_1_scale * pos,
             param_2_offset + param_2_scale * scale,
-            param_3_offset + param_3_scale * color
-        ] 
+            param_3_offset + param_3_scale * color,
+            param_4_offset + param_4_scale * color
+        ]
         set_cube_geo_node_values(name, values)
         # result[name] = values
         # set_cube_z_pos(name, pos)
