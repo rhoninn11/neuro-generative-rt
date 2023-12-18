@@ -48,7 +48,9 @@ class client_thread(conn_thread):
             print("!!! there was error with connection")
 
         if tcp_socket:
+            time.sleep(0.5)
             tcp_socket.close()
+            time.sleep(0.5)
             self.on_disconnect()
 
     def run(self):

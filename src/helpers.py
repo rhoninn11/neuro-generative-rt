@@ -50,6 +50,7 @@ def clean_scene():
 
     # find all the collections and remove them
     collection_names = [col.name for col in bpy.data.collections]
+    print(f"??? collection_names: {collection_names}")
     for name in collection_names:
         bpy.data.collections.remove(bpy.data.collections[name])
 

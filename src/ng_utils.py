@@ -10,6 +10,7 @@ def check_node_group_avail(ng_name):
 def apply_geo_node(obj):
     ng_name = "more_complex_saved_geo_node"
     if not check_node_group_avail(ng_name):
+        print("!!! node group not found !!!")
         return
     
     has_ng = any(mod.type == 'NODES' for mod in obj.modifiers)
