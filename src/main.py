@@ -25,6 +25,7 @@ config_for_multifile_python()
 import helpers
 import anim
 import ng_utils
+
 importlib.reload(helpers)
 importlib.reload(anim)
 importlib.reload(ng_utils)
@@ -38,44 +39,19 @@ chb.client_hub().stop()
 importlib.reload(chb)
 client_hub = chb.client_hub
 
+import geometry_spawner as gs
+importlib.reload(gs)
+geometry_spawner = gs.geometry_spawner()
+
 # -------------------- main --------------------
 
 import bpy
-import math
-def primitive_name(base, idx):
-    name = f"{base}"
-    if idx > 0:
-        name = f"{name}.{idx:03d}"
-    return name
-
-def spawn_cubes():
-    cube_names = []
-    cube_num = 10
-    distance = 20
-    delta = distance / (cube_num - 1)
-
-    for i in range(cube_num):
-        loc = (i * delta, 0, 0)
-        bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=loc, scale=(1, 1, 1))
-        cube_names.append(primitive_name("Cube", i))
-
-    return cube_names
-
-def apply_geo_node(cube_names):
-    for name in cube_names:
-        ng_utils.apply_geo_node_named_obj(name)
-
-def set_proper_transforms(cube_names):
-    for name in cube_names:
-        obj = bpy.data.objects.get(name)
-        if obj:
-            obj.rotation_euler[1] = math.radians(90)
-    
+import math 
 
 def spawn_content():
-    cube_names = spawn_cubes()
-    apply_geo_node(cube_names)
-    set_proper_transforms(cube_names)
+    cube_names = geometry_spawner.spawn_cubes()
+    geometry_spawner.apply_geo_node(cube_names)
+    geometry_spawner.set_proper_transforms(cube_names)
 
     return cube_names
 

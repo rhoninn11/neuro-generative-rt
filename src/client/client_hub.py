@@ -44,6 +44,9 @@ class client_hub(metaclass=singleton_meta):
 
     def animate_by_server(self, cube_names):
         self.data_overflow_sync()
+        if self.thread.out_queue.queue_len() == 0:
+            return
+        
         self.last_data = self.thread.out_queue.dequeue_item()
         cubes_osc(cube_names, self.last_data)
 
