@@ -37,11 +37,12 @@ importlib.reload(ng_utils)
 import client.client_hub as chb
 chb.client_hub().stop()
 importlib.reload(chb)
-client_hub = chb.client_hub
 
-import geometry_spawner as gs
-importlib.reload(gs)
-geometry_spawner = gs.geometry_spawner()
+import geometry_manager as gm
+importlib.reload(gm)
+
+import camera_manager as cm
+importlib.reload(cm)
 
 # -------------------- main --------------------
 
@@ -49,11 +50,30 @@ import bpy
 import math 
 
 def spawn_content():
-    cube_names = geometry_spawner.spawn_cubes()
-    geometry_spawner.apply_geo_node(cube_names)
-    geometry_spawner.set_proper_transforms(cube_names)
+    cm.camera_manager().spawn_camera()
+
+    cube_names = gm.geometry_manager().spawn_cubes()
+    gm.geometry_manager().apply_geo_node(cube_names)
+    gm.geometry_manager().set_proper_transforms(cube_names)
 
     return cube_names
+
+
+def animate_all(scene):
+    chb.client_hub().animate_by_server()
+    cm.camera_manager().animate_camera()
+
+def setup_animation(cube_names):
+    chb.client_hub().set_cube_names(cube_names)
+    bpy.app.handlers.frame_change_pre.append(animate_all)
+    print(f"--- animation setup done ---")
+
+def clear_animation():
+    while(len(bpy.app.handlers.frame_change_pre) != 0):
+        bpy.app.handlers.frame_change_pre.pop()
+
+    print(f"--- animation cleared ---")
+
 
 def main():
     """
@@ -64,9 +84,11 @@ def main():
     helpers.scene_setup()
 
     cube_names = spawn_content()
-    # anim.setup_animation(cube_names)
-    client_hub().setup_animation(cube_names)
-    client_hub().start()
+    clear_animation()
+    print(f"--- animation cleared ---")
+    print(f"{cube_names}")
+    setup_animation(cube_names)
+    chb.client_hub().start()
 
     print("--- script done ---")
 

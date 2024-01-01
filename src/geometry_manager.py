@@ -7,10 +7,10 @@ importlib.reload(ng_utils)
 import bpy
 import math
 
-class geometry_spawner(metaclass=singleton_meta):
+class geometry_manager(metaclass=singleton_meta):
 
     def __init__(self):
-        print(f"+++ geometry_spawner init +++")
+        print(f"+++ geometry_manager init +++")
 
     def _primitive_name(self, base, idx):
         name = f"{base}"
