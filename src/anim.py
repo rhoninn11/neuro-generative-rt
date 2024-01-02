@@ -11,6 +11,11 @@ def set_cube_z_pos(name: str, value: float):
     if obj:
         obj.location.z = value
 
+def move_cube(name: str, delta: float):
+    obj = bpy.data.objects.get(name)
+    if obj:
+        obj.location.x += delta
+
 def set_cube_scale(name: str, value: float):
     obj = bpy.data.objects.get(name)
     if obj:
@@ -22,6 +27,23 @@ def set_cube_geo_node_values(name: str, values: list[float]):
     obj = bpy.data.objects.get(name)
     if obj:
         ng_ctrl_utils.apply_geo_node_control(obj, values)
+
+def set_elo(name, delta, theta, beta):
+        param_1_offset = 0.75
+        param_1_scale = 1.45 - param_1_offset
+
+        param_2_offset = 0.45
+        param_2_scale = 1.45 - param_2_offset   
+
+        param_3_offset = 0.00
+        param_3_scale = 0.1 - param_3_offset
+
+        values = [
+            param_1_offset + param_1_scale * delta,
+            param_2_offset + param_2_scale * theta,
+            param_3_offset + param_3_scale * beta,
+        ]
+        set_cube_geo_node_values(name, values)
 
 
 def cubes_osc(names: list[str], data: list[list[float]]):
@@ -39,28 +61,6 @@ def cubes_osc(names: list[str], data: list[list[float]]):
 
     result = {}
     for name, pos, scale, color in zip(_names, _pos_data, _scale_data, _color_data):
-        
-        param_1_offset = 0.75
-        param_1_scale = 1.45 - param_1_offset
+        set_elo(name, pos, scale, color)
 
-        param_2_offset = 0.45
-        param_2_scale = 1.45 - param_2_offset   
-
-        param_3_offset = 0.00
-        param_3_scale = 0.1 - param_3_offset
-
-        param_4_offset = 0.00
-        param_4_scale = 1.00 - param_3_offset
-
-        values = [
-            param_1_offset + param_1_scale * pos,
-            param_2_offset + param_2_scale * scale,
-            param_3_offset + param_3_scale * color,
-            param_4_offset + param_4_scale * color
-        ]
-        set_cube_geo_node_values(name, values)
-        # result[name] = values
-        # set_cube_z_pos(name, pos)
-        # set_cube_scale(name, scale)
-    # print(result)?
-    bpy.context.view_layer.update()
+    # bpy.context.view_layer.update()

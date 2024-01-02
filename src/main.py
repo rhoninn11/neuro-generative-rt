@@ -51,12 +51,9 @@ import math
 
 def spawn_content():
     cm.camera_manager().spawn_camera()
-
-    cube_names = gm.geometry_manager().spawn_cubes()
-    gm.geometry_manager().apply_geo_node(cube_names)
-    gm.geometry_manager().set_proper_transforms(cube_names)
-
-    return cube_names
+    gm.geometry_manager().restart()
+    # cube_names = gm.geometry_manager().spawn_cubes()
+    return ["elo"]
 
 
 def animate_all(scene):

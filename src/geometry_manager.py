@@ -11,32 +11,33 @@ class geometry_manager(metaclass=singleton_meta):
 
     def __init__(self):
         print(f"+++ geometry_manager init +++")
+        self.cube_num = 0
 
-    def _primitive_name(self, base, idx):
+    def restart(self):
+        self.cube_num = 0
+
+    def _primitive_name(self, base):
+        idx = self.cube_num
         name = f"{base}"
         if idx > 0:
             name = f"{name}.{idx:03d}"
+        self.cube_num += 1
         return name
 
-    def spawn_cubes(self):
+    def spawn_cubes(self, at_x=0, cube_num=1, delta=0.2):
         cube_names = []
-        cube_num = 10
-        distance = 20
-        delta = distance / (cube_num - 1)
 
         for i in range(cube_num):
-            loc = (i * delta, 0, 0)
-            bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=loc, scale=(1, 1, 1))
-            cube_names.append(self._primitive_name("Cube", i))
+            name = self._primitive_name("Cube")
+            transform = {
+                "location": (i * delta + at_x, 0, 0),
+                "scale": (1, 1, 1),
+                "rotation": (0, math.radians(90), 0)
+            
+            }
+            bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', **transform)
+            ng_utils.apply_geo_node_named_obj(name)
+            print(f"+++ spawned cube: {name} - geo aplied+++")
+            cube_names.append(name)
 
         return cube_names
-
-    def apply_geo_node(self, cube_names):
-        for name in cube_names:
-            ng_utils.apply_geo_node_named_obj(name)
-
-    def set_proper_transforms(self, cube_names):
-        for name in cube_names:
-            obj = bpy.data.objects.get(name)
-            if obj:
-                obj.rotation_euler[1] = math.radians(90)

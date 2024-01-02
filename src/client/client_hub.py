@@ -7,7 +7,11 @@ import importlib
 import anim
 importlib.reload(anim) 
 
-from anim import cubes_osc
+from anim import cubes_osc, move_cube
+
+import geometry_manager as gm
+importlib.reload(gm)
+from geometry_manager import geometry_manager
 
 class client_hub(metaclass=singleton_meta):
     def __init__(self):
@@ -19,8 +23,14 @@ class client_hub(metaclass=singleton_meta):
 
         self.cube_names = []
 
+        self.main_cube_name = None
+        self.main_position = 0
+        self.frame_counter = 30
+        self.do_started = False
+
     def set_cube_names(self, cube_names):
         self.cube_names = cube_names
+        self.main_cube_name = cube_names[len(cube_names)-1]
 
     def start(self):
         if self.is_running:
@@ -38,6 +48,7 @@ class client_hub(metaclass=singleton_meta):
         print(f"+++ stopping thread")
         self.thread.stop()
         self.is_running = False
+        self.do_started = False
 
     def data_overflow_sync(self):
         anim_frames = self.thread.out_queue.queue_len()
@@ -51,5 +62,24 @@ class client_hub(metaclass=singleton_meta):
         if self.thread.out_queue.queue_len() == 0:
             return
         
+        if not self.do_started:
+            self.do_started = True
+            self.frame_counter = 0
+        
         self.last_data = self.thread.out_queue.dequeue_item()
-        cubes_osc(self.cube_names, self.last_data)
+
+        x_pre_frame = -0.02
+        self.main_position += x_pre_frame
+
+        self.frame_counter += 1
+        if self.frame_counter >= 30:
+            self.frame_counter = 0
+            cubes = geometry_manager().spawn_cubes(at_x=self.main_position)
+            self.set_cube_names(cubes)
+            print(f" main cube name: {self.main_cube_name}")
+            
+        
+        move_cube(self.main_cube_name, x_pre_frame)
+        cubes_osc([self.main_cube_name], self.last_data)
+
+        

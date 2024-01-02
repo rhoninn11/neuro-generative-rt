@@ -3,7 +3,7 @@ import bpy
 def check_node_group_avail(ng_name):
     avail_groups = bpy.data.node_groups
     names = [ng.name for ng in avail_groups]
-    print(names)
+    # print(names)
     return ng_name in names
 
 
