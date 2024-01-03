@@ -1,5 +1,12 @@
 import bpy
 
+import importlib
+
+import utils.blend as blendu
+importlib.reload(blendu)
+from utils.blend import deactivate_obj
+
+
 def check_node_group_avail(ng_name):
     avail_groups = bpy.data.node_groups
     names = [ng.name for ng in avail_groups]
@@ -30,3 +37,5 @@ def apply_geo_node_named_obj(object_name):
     obj = bpy.data.objects.get(object_name)
     if obj:
         apply_geo_node(obj)
+        deactivate_obj(obj)
+        

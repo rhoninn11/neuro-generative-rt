@@ -22,8 +22,8 @@ class camera_manager(metaclass=singleton_meta):
         bpy.ops.object.camera_add(enter_editmode=False, align='VIEW', **cam_config)
         bpy.context.scene.camera = bpy.data.objects["Camera"]
 
-    def animate_camera(self):
+    def animate_camera(self, motion_speed=0.02):
         print(f"+++ animate_camera +++")
 
         cam = bpy.data.objects["Camera"]
-        cam.location[0] -= 0.02
+        cam.location[0] += -motion_speed

@@ -57,7 +57,7 @@ class client_hub(metaclass=singleton_meta):
             for _ in range(anim_frames - 5):
                 self.thread.out_queue.dequeue_item()
 
-    def animate_by_server(self):
+    def animate_by_server(self, motion_speed=0.02):
         self.data_overflow_sync()
         if self.thread.out_queue.queue_len() == 0:
             return
@@ -68,7 +68,7 @@ class client_hub(metaclass=singleton_meta):
         
         self.last_data = self.thread.out_queue.dequeue_item()
 
-        x_pre_frame = -0.02
+        x_pre_frame = -motion_speed
         self.main_position += x_pre_frame
 
         self.frame_counter += 1

@@ -57,8 +57,9 @@ def spawn_content():
 
 
 def animate_all(scene):
-    chb.client_hub().animate_by_server()
-    cm.camera_manager().animate_camera()
+    motion_speed = 0.05
+    chb.client_hub().animate_by_server(motion_speed)
+    cm.camera_manager().animate_camera(motion_speed)
 
 def setup_animation(cube_names):
     chb.client_hub().set_cube_names(cube_names)
