@@ -20,7 +20,22 @@ class camera_manager(metaclass=singleton_meta):
             'scale': (1, 1, 1)
         }
         bpy.ops.object.camera_add(enter_editmode=False, align='VIEW', **cam_config)
-        bpy.context.scene.camera = bpy.data.objects["Camera"]
+        camera = bpy.context.object
+        bpy.context.scene.camera = camera
+        # bpy.context.scene.camera = bpy.data.objects["Camera"]
+
+
+        lgt_config = {
+            'location': (0, 0, -7),
+            'scale': (1, 1, 1)        
+        }
+        bpy.ops.object.light_add(type='POINT', align='WORLD', **lgt_config)
+        light = bpy.context.object
+
+        light.parent = camera
+        light.data.energy = 200
+        light.data.shadow_soft_size = 1
+
 
     def animate_camera(self, motion_speed=0.02):
         print(f"+++ animate_camera +++")
